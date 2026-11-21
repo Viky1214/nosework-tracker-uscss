@@ -49,3 +49,7 @@ nav button.active{background:#cb0c38;color:white}
 .meter{height:12px}.fill{background:#10429e}
 #dashboard:after{content:'';display:block;height:11px;margin:22px -20px -20px;background:linear-gradient(105deg,#0b2c73 30%,#fff 55%,#c8103a 82%);border-radius:0 0 16px 16px}
 @media(max-width:550px){header p{padding-left:0}header h1{gap:8px}.brandmark{width:44px;height:44px}nav button{font-size:.7rem;padding:9px 3px}nav .tab-icon{font-size:1.25rem}}
+
+/* v2.4.2 : les pictogrammes SVG de app.js remplacent les anciens symboles CSS. */
+.exercise::before { display: none !important; content: none !important; }
+.exercise { padding-left: 0; }
