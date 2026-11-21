@@ -49,11 +49,23 @@ $('pdfAnalyze').addEventListener('click',async()=>{
   }
   if(!candidates.length){status.textContent='Aucun résultat exploitable pour '+(state.dog||'Viky')+'. Ce PDF est peut-être scanné ou utilise un autre format. Aucun résultat enregistré.';return}
   status.textContent=`${candidates.length} résultat(s) détecté(s) sur ${pdf.numPages} pages. Vérifie chaque ligne avant d’enregistrer.${errors.length?' '+errors.join(' ; '):''}`;
-  preview.innerHTML='<div class="pdf-scroll"><table class="pdf-table"><thead><tr><th>Date</th><th>Niveau</th><th>Exercice</th><th>Q/NQ</th><th>Temps</th><th>Rang</th><th>Participants</th><th>État</th></tr></thead><tbody>'+candidates.map((r,i)=>`<tr><td>${r.date}</td><td>${r.level}</td><td>${r.exercise}</td><td>${r.qualified?'Q':'NQ'}</td><td><input data-i="${i}" data-field="time" value="${r.time}" aria-label="Temps ${r.exercise}"></td><td><input data-i="${i}" data-field="rank" value="${r.rank}" type="number" min="1" aria-label="Rang ${r.exercise}"></td><td><input data-i="${i}" data-field="participants" value="${r.participants}" type="number" min="1" aria-label="Participants ${r.exercise}"></td><td>${state.results.some(x=>sameResult(x,r))?'Déjà présent':'Nouveau'}</td></tr>`).join('')+'</tbody></table></div>';
+  preview.innerHTML='<div class="pdf-scroll"><table class="pdf-table"><thead><tr><th>Date</th><th>Niveau</th><th>Exercice</th><th>Q/NQ</th><th>Temps</th><th>Rang</th><th>Participants</th><th>État</th></tr></thead><tbody>'+candidates.map((r,i)=>`<tr><td>${r.date}</td><td>${r.level}</td><td>${r.exercise}</td><td>${r.qualified?'Q':'NQ'}</td><td><input data-i="${i}" data-field="time" value="${r.time}" aria-label="Temps ${r.exercise}"></td><td><input data-i="${i}" data-field="rank" value="${r.rank}" type="number" min="1" aria-label="Rang ${r.exercise}"></td><td><input data-i="${i}" data-field="participants" value="${r.participants}" type="number" min="1" aria-label="Participants ${r.exercise}"></td><td>${resultStatus(r)}</td></tr>`).join('')+'</tbody></table></div>';
   $('pdfSave').disabled=false;
  }catch(err){status.textContent='Lecture impossible : '+err.message+' Aucun résultat enregistré.'}
 });
-function sameResult(a,b){return a.date===b.date&&norm(a.event)===norm(b.event)&&a.level===b.level&&a.exercise===b.exercise}
+// Compare accents, case, whitespace and punctuation without confusing distinct events.
+function eventKey(s){return norm(s).replace(/[^a-z0-9]+/g,' ').replace(/\s+/g,' ').trim()}
+function sameResult(a,b){return a.date===b.date&&eventKey(a.event)===eventKey(b.event)&&a.level===b.level&&a.exercise===b.exercise}
+function possibleDuplicate(a,b){
+ if(a.date!==b.date||a.level!==b.level||a.exercise!==b.exercise)return false;
+ const stripTest=s=>eventKey(s).replace(/(?:^| )test$/,'').trim();
+ return stripTest(a.event)===stripTest(b.event);
+}
+function resultStatus(r){
+ if(state.results.some(x=>sameResult(x,r)))return 'Déjà présent';
+ if(state.results.some(x=>possibleDuplicate(x,r)))return 'Doublon potentiel';
+ return 'Nouveau';
+}
 $('pdfSave').addEventListener('click',async()=>{
  if(!candidates.length)return;
  if(!candidateDogId||candidateDogId!==window.getSelectedDogId?.()){
@@ -62,13 +74,15 @@ $('pdfSave').addEventListener('click',async()=>{
  preview.querySelectorAll('input[data-i]').forEach(input=>{candidates[Number(input.dataset.i)][input.dataset.field]=input.value.trim()});
  const invalid=candidates.find(r=>r.time&&!/^\d+:[0-5]\d,\d{2}$/.test(r.time));
  if(invalid){status.textContent='Corrige les temps au format mm:ss,cc avant de valider.';return}
- const incoming=candidates.filter(r=>!state.results.some(x=>sameResult(x,r)));
- if(!incoming.length){status.textContent='Tous les résultats existent déjà. Aucun doublon ajouté.';return}
+ const incoming=candidates.filter(r=>resultStatus(r)==='Nouveau');
+ const potential=candidates.filter(r=>resultStatus(r)==='Doublon potentiel').length;
+ if(!incoming.length){status.textContent=potential?`${potential} doublon(s) potentiel(s) non importé(s). Vérifie le nom du concours ou saisis manuellement les résultats s’il s’agit d’un autre concours.`:'Tous les résultats existent déjà. Aucun doublon ajouté.';return}
+ if(potential&&!confirm(`${potential} doublon(s) potentiel(s) seront exclus de cet import. Continuer avec ${incoming.length} résultat(s) clairement nouveaux ?`))return;
  if(!confirm(`Ajouter ${incoming.length} nouveau(x) résultat(s) pour « ${state.dog} » ? Les résultats existants ne seront pas modifiés.`))return;
  const button=$('pdfSave');button.disabled=true;status.textContent='Enregistrement Firebase en cours…';
  try{
   const result=await window.saveImportedResults(incoming,candidateDogId);
-  status.textContent=`Enregistrement Firebase confirmé : ${result.added} nouveau(x) résultat(s). ${candidates.length-result.added} doublon(s) ignoré(s).`;
+  status.textContent=`Enregistrement Firebase confirmé : ${result.added} nouveau(x) résultat(s). ${candidates.length-result.added} résultat(s) non ajouté(s) (déjà présents ou à vérifier).`;
   candidates=[];candidateDogId=null;preview.innerHTML='';
  }catch(err){status.textContent='Échec de l’enregistrement : '+err.message+' Vérifie les résultats avant de réessayer.';button.disabled=false}
 });
