@@ -27,7 +27,7 @@ function analyze(lines,dog){
  const rank=qualified&&time&&valid.length?String(1+valid.filter(t=>seconds(t)<seconds(time)).length):'';
  // Count all competitors (Q and NQ), not just qualified dogs.
  // If rows are ambiguous, leave the field blank for manual review.
- const competitorRows=lines.filter(l=>/^\s*\S.+?\s+(?:NQ|Q)\s+(?:\d|ok|time|$)/i.test(l));
+ const competitorRows=lines.filter(l=>/^\s*\S.+?\s+(?:NQ|Q)(?=\s|$)/i.test(l));
  const participants=competitorRows.length>=1&&competitorRows.some(l=>l===row)?String(competitorRows.length):'';
  return {date,level,exercise,qualified,time:qualified?time:'',rank,participants,source:'PDF',review:true};
 }
