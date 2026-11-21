@@ -36,6 +36,32 @@ function download(name,content,type){const a=document.createElement('a'),u=URL.c
 $('exportJson').onclick=()=>{if(!ready())return;download('nosework-'+state.dog+'-sauvegarde.json',JSON.stringify({dog:state.dog,results:state.results},null,2),'application/json')};
 $('exportCsv').onclick=()=>{if(!ready())return;const cols=['date','event','level','exercise','qualified','time','rank','participants'];const csv=[['Date','Concours','Niveau','Exercice','Qualification','Temps','Rang','Participants'],...state.results.map(r=>cols.map(k=>k==='qualified'?(r[k]?'Q':'NQ'):r[k]??''))].map(row=>row.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(';')).join('\r\n');download('nosework-resultats.csv','\ufeff'+csv,'text/csv;charset=utf-8')};
 $('importJson').onchange=async e=>{const file=e.target.files?.[0];e.target.value='';if(!file||!ready())return;try{const v=JSON.parse(await file.text());if(!Array.isArray(v.results)||v.results.some(r=>!LEVELS.includes(r.level)||!EX.includes(r.exercise)||typeof r.date!=='string'||typeof r.event!=='string'||typeof r.qualified!=='boolean'))throw Error('Format de sauvegarde invalide');const existing=new Set(state.results.map(r=>r.id));const incoming=v.results.filter(r=>!r.id||!existing.has(String(r.id)));if(!confirm(`Importer ${incoming.length} résultat(s) dans « ${state.dog} » ? Aucun résultat existant ne sera supprimé. Vérifiez que le bon chien est sélectionné.`))return;const uid=user.uid,selectedDog=dogId;let added=0;for(let i=0;i<incoming.length;i+=400){const batch=writeBatch(db);for(const r of incoming.slice(i,i+400)){const id=r.id&&/^[a-zA-Z0-9_-]{1,120}$/.test(String(r.id))?String(r.id):doc(collection(db,'users',uid,'dogs',selectedDog,'results')).id;const ref=doc(db,'users',uid,'dogs',selectedDog,'results',id);const clean={date:r.date,event:r.event,level:r.level,exercise:r.exercise,qualified:r.qualified,time:String(r.time||''),rank:String(r.rank||''),participants:String(r.participants||''),updatedAt:Number(r.updatedAt)||Date.now()};batch.set(ref,clean);added++}await batch.commit()}alert(`${added} résultat(s) importé(s). Contrôlez les totaux.`)}catch(err){alert('Import impossible : '+err.message)}};
+// Pont sécurisé entre l'import PDF et le chien actuellement sélectionné.
+window.getSelectedDogId=()=>ready()?dogId:null;
+window.saveImportedResults=async(incoming,selectedDogId)=>{
+ if(!ready()||!user||!selectedDogId||selectedDogId!==dogId)throw Error('Le chien sélectionné a changé. Relance l’analyse du PDF.');
+ if(!Array.isArray(incoming)||!incoming.length)return {added:0};
+ const uid=user.uid,chosenDog=dogId;
+ const col=collection(db,'users',uid,'dogs',chosenDog,'results');
+ const existing=(await getDocs(col)).docs.map(d=>d.data());
+ if(!ready()||user.uid!==uid||dogId!==chosenDog)throw Error('La sélection a changé pendant la vérification.');
+ const eventKey=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+ const potential=(a,b)=>{
+  if(a.date!==b.date||a.level!==b.level||a.exercise!==b.exercise)return false;
+  const strip=s=>eventKey(s).replace(/(?:^| )test$/,'').trim();
+  return strip(a.event)===strip(b.event);
+ };
+ const seen=existing.slice();let added=0;
+ // Ne jamais enregistrer un doublon certain ou potentiel, même si les données ont changé depuis l'analyse.
+ for(const r of incoming){
+  if(!ready()||user.uid!==uid||dogId!==chosenDog)throw Error('La sélection a changé pendant l’enregistrement.');
+  if(!r||!r.date||!r.event||!LEVELS.includes(r.level)||!EX.includes(r.exercise)||typeof r.qualified!=='boolean')throw Error('Résultat PDF invalide.');
+  if(seen.some(x=>potential(x,r)))continue;
+  const clean={date:r.date,event:r.event.trim(),level:r.level,exercise:r.exercise,qualified:r.qualified,time:String(r.time||''),rank:String(r.rank||''),participants:String(r.participants||''),source:'PDF',updatedAt:Date.now()};
+  await addDoc(col,clean);seen.push(clean);added++;
+ }
+ return {added};
+};
 // Compatibilité avec le module d'import PDF : les écritures partent vers Firestore.
 window.save=async()=>{if(!ready())throw Error('Connexion requise');const current=await getDocs(resultsCol());const known=new Set(current.docs.map(d=>d.id));const pending=state.results.filter(r=>!known.has(r.id));for(const r of pending){const {id,...data}=r;await addDoc(resultsCol(),data)}render()};
 onAuthStateChanged(auth,u=>{if(unsubscribeDogs)unsubscribeDogs();if(unsubscribeResults)unsubscribeResults();unsubscribeDogs=unsubscribeResults=null;user=u;dogs=[];dogId='';state.results=[];state.dog='';loading=true;show('loggedOut',!u);show('loggedIn',!!u);show('appArea',!!u);$('userName').textContent=u?.displayName||u?.email||'';if(!u){status('Connectez-vous pour accéder à vos données.');return}status('Chargement de vos chiens…');unsubscribeDogs=onSnapshot(dogsCol(),snap=>{dogs=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>a.name.localeCompare(b.name));refreshDogSelect()},e=>status('Erreur de lecture des chiens : '+e.message))});
