@@ -1,16 +1,1 @@
-{
-  "name": "Nosework Tracker",
-  "short_name": "Nosework",
-  "start_url": "./",
-  "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#092f77",
-  "icons": [
-    {
-      "src": "icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    }
-  ]
-}
+{"name":"Nosework Tracker USCSS","short_name":"Nosework","description":"Suivi des qualifications et concours Nosework USCSS","start_url":"./index.html","scope":"./","display":"standalone","background_color":"#f3f7f6","theme_color":"#153e46","icons":[{"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]}
