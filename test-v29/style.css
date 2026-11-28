@@ -1,0 +1,58 @@
+:root{font-family:system-ui,-apple-system,Arial,sans-serif;color:#183139;background:#f3f7f6}*{box-sizing:border-box}body{margin:0}header{background:#153e46;color:white;padding:28px 0 20px}header small{letter-spacing:.16em;color:#b6ded3}h1{margin:7px 0;font-size:1.8rem}header p{margin:0;color:#d3e6e2}.wrap{max-width:850px;margin:auto;padding:0 18px}nav{display:flex;gap:6px;overflow-x:auto;padding:16px 0}button,.filebtn{font:inherit;cursor:pointer;border:1px solid #bfd0cd;background:white;color:#153e46;border-radius:10px;padding:11px 14px;white-space:nowrap}button.active,.primary{background:#176b65;color:white;border-color:#176b65}.panel{background:white;border-radius:16px;padding:20px;box-shadow:0 4px 20px #18313910;margin-bottom:28px}.hidden{display:none}h2{font-size:1.22rem;margin-top:4px}label{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:.9rem}input,select{font:inherit;width:100%;border:1px solid #b9cecb;border-radius:9px;padding:10px;background:#fff;color:#183139}form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}form button{grid-column:1/-1}.toolbar{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px}.toolbar label{flex:1;min-width:150px}.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.stat{padding:16px;background:#eef6f3;border-radius:12px}.stat strong{display:block;font-size:1.8rem;color:#12625d}.muted{color:#657977;font-size:.91rem}.exercise{margin-top:15px}.meter{height:9px;background:#dce8e4;border-radius:10px;overflow:hidden;margin-top:7px}.fill{height:100%;background:#1c8d77}.record{border-bottom:1px solid #e0e9e6;padding:14px 0;display:flex;justify-content:space-between;gap:12px}.record p{margin:5px 0;color:#586c69}.actions{display:flex;flex-wrap:wrap;gap:10px}ol{padding-left:22px;line-height:1.65}#formMsg{color:#176b65}@media(max-width:550px){form{grid-template-columns:1fr}.panel{padding:16px}.record{flex-direction:column}.stats{gap:8px}}
+
+.pdf-import{border:1px solid #d5e6e1;border-radius:12px;padding:15px;margin:16px 0 24px;background:#f8fbfa}.pdf-import h3{margin:0 0 8px}.pdf-import label{margin:12px 0}.pdf-scroll{overflow-x:auto}.pdf-table{border-collapse:collapse;width:100%;font-size:.85rem}.pdf-table th,.pdf-table td{border-bottom:1px solid #d9e5e1;padding:7px;text-align:left}.pdf-table input{min-width:80px;width:90px;padding:6px}.pdf-import button:disabled{opacity:.5;cursor:not-allowed}
+
+/* Nosework Tracker 2.3 — palette inspired by USCSS */
+:root{color:#112650;background:#f4f7fc}
+header{background:linear-gradient(115deg,#09275f,#0b3d91);color:#fff;padding:24px 0 26px;border-bottom:5px solid #bf173f}
+header small{color:#dce9ff}header p{color:#e6edff}
+.header-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.language{display:flex;align-items:center;gap:3px;border-radius:100px;background:#fff;padding:3px}
+.language button{border:0;border-radius:100px;background:transparent;color:#092f77;padding:6px 13px;font-weight:700}
+.language button.selected{background:#bd1641;color:#fff}
+.version{font-size:.8rem;font-weight:500;vertical-align:middle;opacity:.85}
+.dogmark{font-size:1.25rem}
+nav{gap:5px}nav button{flex:1;min-width:max-content;text-align:center;font-weight:650}
+button,.filebtn{color:#092f77;border-color:#ccd7ea}
+button.active,.primary{background:#c4143e;border-color:#c4143e;color:#fff}
+button:hover:not(:disabled){filter:brightness(.96)}
+.panel{box-shadow:0 5px 25px #11265012}
+input,select{border-color:#becce5;color:#14294f}
+.stat{background:#e9f0fc;color:#092f77}
+.stat:nth-child(2){background:#fce9ee;color:#b31339}
+.stat strong{color:#092f77}.stat:nth-child(2) strong{color:#b31339}
+.meter{background:#dbe5f4}.fill{background:linear-gradient(90deg,#123b8e,#245ab7)}
+.muted{color:#64728a}.record{border-color:#e1e7f1}
+.pdf-import{background:#f9fbff;border-color:#d6e0f0}
+.pdf-table th,.pdf-table td{border-color:#e0e7f3}
+#formMsg{color:#0b3d91}
+@media(max-width:550px){header h1{font-size:1.65rem}.language button{padding:6px 11px}}
+
+/* v2.4 visual update: existing data, forms, and Drive sync unchanged */
+header{background:linear-gradient(130deg,#061b50 0%,#0a337b 75%,#092a66 100%);border-bottom:0;padding:18px 0 27px}
+header .wrap{position:relative}header h1{display:flex;align-items:center;gap:12px;font-size:clamp(1.4rem,4vw,2.15rem);line-height:1.15;margin:12px 0 5px}
+.brandmark{width:56px;height:56px;flex:none;border-radius:14px}
+header p{padding-left:68px;font-size:.95rem}
+header small{font-size:.69rem}
+nav{margin-top:-12px;position:relative;z-index:1;background:#fff;border-radius:16px;padding:6px;box-shadow:0 8px 22px #091f501f;gap:2px}
+nav button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:0;white-space:normal;font-size:.84rem;border:0;padding:10px 6px;border-radius:12px;line-height:1.1}
+nav .tab-icon{font-size:1.5rem;line-height:1.1}
+nav button.active{background:#cb0c38;color:white}
+.panel{border:1px solid #e0e7f5}
+.stat{min-height:112px;display:flex;flex-direction:column;justify-content:space-between;font-weight:650}
+.stat strong{font-size:2.2rem;text-align:center}
+.exercise{padding-left:36px;position:relative}
+.exercise:before{position:absolute;left:0;top:0;font-size:1.35rem;color:#092f77;content:'⌂'}
+.exercise:nth-of-type(2):before{content:'♧'}
+.exercise:nth-of-type(3):before{content:'▱'}
+.exercise:nth-of-type(4):before{content:'▣'}
+.meter{height:12px}.fill{background:#10429e}
+#dashboard:after{content:'';display:block;height:11px;margin:22px -20px -20px;background:linear-gradient(105deg,#0b2c73 30%,#fff 55%,#c8103a 82%);border-radius:0 0 16px 16px}
+@media(max-width:550px){header p{padding-left:0}header h1{gap:8px}.brandmark{width:44px;height:44px}nav button{font-size:.7rem;padding:9px 3px}nav .tab-icon{font-size:1.25rem}}
+
+/* v2.4.2 : les pictogrammes SVG de app.js remplacent les anciens symboles CSS. */
+.exercise::before { display: none !important; content: none !important; }
+.exercise { padding-left: 0; }
+
+#uscssText{width:100%;box-sizing:border-box;min-height:120px;font:inherit;padding:10px} #browserHelp{overflow-wrap:anywhere} .pdf-scroll{overflow-x:auto} button:disabled{opacity:.55;cursor:not-allowed}
+#installPanel[hidden],#installHelp[hidden],#offlineNotice[hidden],#installApp[hidden]{display:none} .event-award{padding:10px;border-left:3px solid #092f77;background:#edf2fa;overflow-wrap:anywhere}.pdf-table td:last-child{min-width:100px}.pdf-table td:first-child{min-width:125px}.pdf-table td:nth-child(2){min-width:100px}.pdf-table td:nth-child(3){min-width:95px}@media(max-width:600px){input,select,textarea{font-size:16px!important;max-width:100%}button{min-height:44px}.pdf-import{padding:10px}.pdf-scroll{max-width:100%}.pdf-table{min-width:760px} .record{flex-wrap:wrap} #installApp{width:100%}}
